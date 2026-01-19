@@ -34,13 +34,13 @@ jobs:
 
       - name: Build site
         run: |
-          rm -rf site
-          mkdocs build -f students/k3340/Abakunov_Kirill/mkdocs.yml --site-dir site
-          test -f site/index.html
+          rm -rf "$GITHUB_WORKSPACE/site"
+          mkdocs build -f students/k3340/Abakunov_Kirill/mkdocs.yml --site-dir "$GITHUB_WORKSPACE/site"
+          test -f "$GITHUB_WORKSPACE/site/index.html"
 
       - name: Deploy to gh-pages branch
         uses: peaceiris/actions-gh-pages@v4
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          publish_dir: site
+          publish_dir: ${{ github.workspace }}/site
           publish_branch: gh-pages
