@@ -36,9 +36,9 @@ jobs:
 
       - name: Build site
         run: |
-          mkdocs build \
-            -f students/k3340/Abakunov_Kirill/mkdocs.yml \
-            -d site
+          mkdir -p site
+          mkdocs build -f students/k3340/Abakunov_Kirill/mkdocs.yml --site-dir site
+          ls -la site | head -200
 
       - uses: actions/upload-pages-artifact@v3
         with:
