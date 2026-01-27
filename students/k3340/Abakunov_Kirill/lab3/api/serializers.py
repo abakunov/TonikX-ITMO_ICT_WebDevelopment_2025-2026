@@ -2,8 +2,9 @@
 Сериализаторы для REST API
 """
 from rest_framework import serializers
-from .models import Room, Guest, Staff, CleaningSchedule
+from django.db import models
 from django.utils import timezone
+from .models import Room, Guest, Staff, CleaningSchedule
 
 
 class RoomSerializer(serializers.ModelSerializer):
@@ -41,13 +42,13 @@ class GuestSerializer(serializers.ModelSerializer):
     
     full_name = serializers.CharField(read_only=True)
     is_current = serializers.BooleanField(read_only=True)
-    room_details = RoomSerializer(source='room', read_only=True)
+    room_number = serializers.CharField(source='room.number', read_only=True)
     
     class Meta:
         model = Guest
         fields = [
             'id', 'passport_number', 'last_name', 'first_name', 
-            'middle_name', 'full_name', 'city', 'room', 'room_details',
+            'middle_name', 'full_name', 'city', 'room', 'room_number',
             'check_in_date', 'check_out_date', 'is_current'
         ]
     
@@ -113,23 +114,31 @@ class GuestCheckOutSerializer(serializers.ModelSerializer):
         return value
 
 
+class CleaningScheduleSerializer(serializers.ModelSerializer):
+    """Сериализатор для расписания уборки"""
+    
+    weekday_display = serializers.CharField(source='get_weekday_display', read_only=True)
+    staff_name = serializers.CharField(source='staff.full_name', read_only=True)
+    
+    class Meta:
+        model = CleaningSchedule
+        fields = [
+            'id', 'staff', 'staff_name', 'floor', 
+            'weekday', 'weekday_display'
+        ]
+
+
 class StaffSerializer(serializers.ModelSerializer):
     """Сериализатор для служащих"""
     
     full_name = serializers.CharField(read_only=True)
-    schedules = serializers.SerializerMethodField()
     
     class Meta:
         model = Staff
         fields = [
             'id', 'last_name', 'first_name', 'middle_name', 
-            'full_name', 'is_active', 'hire_date', 'fire_date', 'schedules'
+            'full_name', 'is_active', 'hire_date', 'fire_date'
         ]
-    
-    def get_schedules(self, obj):
-        """Получить расписание уборки"""
-        schedules = obj.schedules.all()
-        return CleaningScheduleSerializer(schedules, many=True).data
     
     def validate(self, data):
         """Валидация данных служащего"""
@@ -168,20 +177,3 @@ class StaffFireSerializer(serializers.ModelSerializer):
                 "Дата увольнения не может быть раньше даты приема на работу"
             )
         return value
-
-
-class CleaningScheduleSerializer(serializers.ModelSerializer):
-    """Сериализатор для расписания уборки"""
-    
-    weekday_display = serializers.CharField(source='get_weekday_display', read_only=True)
-    staff_details = StaffSerializer(source='staff', read_only=True)
-    
-    class Meta:
-        model = CleaningSchedule
-        fields = [
-            'id', 'staff', 'staff_details', 'floor', 
-            'weekday', 'weekday_display'
-        ]
-
-
-from django.db import models

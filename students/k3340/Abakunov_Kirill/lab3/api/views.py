@@ -21,10 +21,36 @@ class RoomViewSet(viewsets.ModelViewSet):
     
     queryset = Room.objects.all()
     serializer_class = RoomSerializer
-    permission_classes = [IsAuthenticatedOrReadOnly]
+    permission_classes = [IsAuthenticated]
     filter_backends = [filters.SearchFilter, filters.OrderingFilter]
     search_fields = ['number', 'phone']
     ordering_fields = ['number', 'floor', 'price_per_day']
+    
+    def destroy(self, request, *args, **kwargs):
+        """Удаление номера с проверкой связанных записей"""
+        instance = self.get_object()
+        
+        # Проверяем наличие текущих гостей (без check_out_date)
+        current_guests = instance.guests.filter(check_out_date__isnull=True)
+        if current_guests.exists():
+            return Response(
+                {
+                    'error': f'Невозможно удалить номер {instance.number}. '
+                             f'В номере проживают {current_guests.count()} гостей. '
+                             f'Сначала необходимо выселить или переместить всех гостей.'
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        # Удаляем исторические записи гостей (уже выселенных)
+        # Это необходимо, так как on_delete=models.PROTECT блокирует удаление Room
+        historical_guests = instance.guests.filter(check_out_date__isnull=False)
+        historical_count = historical_guests.count()
+        if historical_count > 0:
+            historical_guests.delete()
+        
+        # Теперь можно безопасно удалить номер
+        return super().destroy(request, *args, **kwargs)
     
     @action(detail=False, methods=['get'])
     def available(self, request):
@@ -84,7 +110,7 @@ class GuestViewSet(viewsets.ModelViewSet):
     
     queryset = Guest.objects.all()
     serializer_class = GuestSerializer
-    permission_classes = [IsAuthenticatedOrReadOnly]
+    permission_classes = [IsAuthenticated]
     filter_backends = [filters.SearchFilter, filters.OrderingFilter]
     search_fields = ['passport_number', 'last_name', 'first_name', 'city']
     ordering_fields = ['check_in_date', 'check_out_date', 'last_name']
@@ -253,7 +279,24 @@ class StaffViewSet(viewsets.ModelViewSet):
     
     queryset = Staff.objects.all()
     serializer_class = StaffSerializer
-    permission_classes = [IsAuthenticatedOrReadOnly]
+    permission_classes = [IsAuthenticated]
+    
+    def destroy(self, request, *args, **kwargs):
+        """Удаление служащего с проверкой связанных записей"""
+        instance = self.get_object()
+        
+        # Проверяем наличие связанных расписаний
+        if instance.schedules.exists():
+            return Response(
+                {
+                    'error': f'Невозможно удалить служащего {instance.full_name}. '
+                             f'У служащего есть связанные расписания уборки. '
+                             f'Сначала необходимо удалить или изменить расписания.'
+                },
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        return super().destroy(request, *args, **kwargs)
     filter_backends = [filters.SearchFilter, filters.OrderingFilter]
     search_fields = ['last_name', 'first_name', 'middle_name']
     ordering_fields = ['last_name', 'hire_date']
@@ -311,7 +354,7 @@ class CleaningScheduleViewSet(viewsets.ModelViewSet):
     
     queryset = CleaningSchedule.objects.all()
     serializer_class = CleaningScheduleSerializer
-    permission_classes = [IsAuthenticatedOrReadOnly]
+    permission_classes = [IsAuthenticated]
     filter_backends = [filters.OrderingFilter]
     ordering_fields = ['weekday', 'floor']
     

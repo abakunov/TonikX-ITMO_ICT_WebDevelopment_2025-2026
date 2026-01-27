@@ -75,7 +75,9 @@ DATABASES = {
         'USER': os.getenv('DB_USER', 'postgres'),
         'PASSWORD': os.getenv('DB_PASSWORD', 'postgres'),
         'HOST': os.getenv('DB_HOST', 'localhost'),
-        'PORT': os.getenv('DB_PORT', '5432'),
+        # Inside Docker network, PostgreSQL listens on port 5432 (container internal port)
+        # DB_PORT from .env is used for host mapping only
+        'PORT': '5432' if os.getenv('DB_HOST') == 'db' else os.getenv('DB_PORT', '5432'),
     }
 }
 
@@ -115,6 +117,7 @@ USE_TZ = True
 # https://docs.djangoproject.com/en/5.0/howto/static-files/
 
 STATIC_URL = 'static/'
+STATIC_ROOT = BASE_DIR / 'staticfiles'
 STATICFILES_DIRS = [BASE_DIR / 'static']
 
 # Media files
