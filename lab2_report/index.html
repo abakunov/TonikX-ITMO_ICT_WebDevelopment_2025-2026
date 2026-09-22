@@ -6,32 +6,29 @@
       <meta charset="utf-8">
       <meta name="viewport" content="width=device-width,initial-scale=1">
       
-        <meta name="description" content="Отчеты по всем лабораторным работам (Lab 1, Lab 2, Lab 3)">
+        <meta name="description" content="Отчеты по лабораторным работам FastAPI, параллельность, Docker и Celery">
       
       
-        <meta name="author" content="Абакунов Кирилл, группа K3340">
+        <meta name="author" content="Абакунов Кирилл">
       
       
       
-        <link rel="prev" href="../lab1/">
+        <link rel="prev" href="../lab1_report/">
       
       
-        <link rel="next" href="../lab3/">
-      
-      
-        
+        <link rel="next" href="../lab3_report/">
       
       
       <link rel="icon" href="../assets/images/favicon.png">
-      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.7.1">
+      <meta name="generator" content="mkdocs-1.6.1, mkdocs-material-9.5.49">
     
     
       
-        <title>Lab 2 - Лабораторные работы по Web-программированию</title>
+        <title>Лабораторная 2 - Web Development Labs</title>
       
     
     
-      <link rel="stylesheet" href="../assets/stylesheets/main.484c7ddc.min.css">
+      <link rel="stylesheet" href="../assets/stylesheets/main.6f8fc17f.min.css">
       
       
 
@@ -54,6 +51,7 @@
     
       
 
+    
     
     
   </head>
@@ -84,7 +82,7 @@
 
 <header class="md-header md-header--shadow" data-md-component="header">
   <nav class="md-header__inner md-grid" aria-label="Верхний колонтитул">
-    <a href=".." title="Лабораторные работы по Web-программированию" class="md-header__button md-logo" aria-label="Лабораторные работы по Web-программированию" data-md-component="logo">
+    <a href=".." title="Web Development Labs" class="md-header__button md-logo" aria-label="Web Development Labs" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
@@ -98,13 +96,13 @@
       <div class="md-header__ellipsis">
         <div class="md-header__topic">
           <span class="md-ellipsis">
-            Лабораторные работы по Web-программированию
+            Web Development Labs
           </span>
         </div>
         <div class="md-header__topic" data-md-component="header-topic">
           <span class="md-ellipsis">
             
-              Lab 2
+              Лабораторная 2
             
           </span>
         </div>
@@ -116,13 +114,11 @@
     
     
     
-      
-      
-        <label class="md-header__button md-icon" for="__search">
-          
-          <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
-        </label>
-        <div class="md-search" data-md-component="search" role="dialog">
+      <label class="md-header__button md-icon" for="__search">
+        
+        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M9.5 3A6.5 6.5 0 0 1 16 9.5c0 1.61-.59 3.09-1.56 4.23l.27.27h.79l5 5-1.5 1.5-5-5v-.79l-.27-.27A6.52 6.52 0 0 1 9.5 16 6.5 6.5 0 0 1 3 9.5 6.5 6.5 0 0 1 9.5 3m0 2C7 5 5 7 5 9.5S7 14 9.5 14 14 12 14 9.5 12 5 9.5 5"/></svg>
+      </label>
+      <div class="md-search" data-md-component="search" role="dialog">
   <label class="md-search__overlay" for="__search"></label>
   <div class="md-search__inner" role="search">
     <form class="md-search__form" name="search">
@@ -154,7 +150,6 @@
     </div>
   </div>
 </div>
-      
     
     
   </nav>
@@ -182,13 +177,13 @@
 
 <nav class="md-nav md-nav--primary" aria-label="Навигация" data-md-level="0">
   <label class="md-nav__title" for="__drawer">
-    <a href=".." title="Лабораторные работы по Web-программированию" class="md-nav__button md-logo" aria-label="Лабораторные работы по Web-программированию" data-md-component="logo">
+    <a href=".." title="Web Development Labs" class="md-nav__button md-logo" aria-label="Web Development Labs" data-md-component="logo">
       
   
   <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24"><path d="M12 8a3 3 0 0 0 3-3 3 3 0 0 0-3-3 3 3 0 0 0-3 3 3 3 0 0 0 3 3m0 3.54C9.64 9.35 6.5 8 3 8v11c3.5 0 6.64 1.35 9 3.54 2.36-2.19 5.5-3.54 9-3.54V8c-3.5 0-6.64 1.35-9 3.54"/></svg>
 
     </a>
-    Лабораторные работы по Web-программированию
+    Web Development Labs
   </label>
   
   <ul class="md-nav__list" data-md-scrollfix>
@@ -203,16 +198,9 @@
       <a href=".." class="md-nav__link">
         
   
-  
   <span class="md-ellipsis">
-    
-  
     Главная
-  
-
-    
   </span>
-  
   
 
       </a>
@@ -227,19 +215,12 @@
   
   
     <li class="md-nav__item">
-      <a href="../lab1/" class="md-nav__link">
+      <a href="../lab1_report/" class="md-nav__link">
         
   
-  
   <span class="md-ellipsis">
-    
-  
-    Lab 1
-  
-
-    
+    Лабораторная 1
   </span>
-  
   
 
       </a>
@@ -266,16 +247,9 @@
         <label class="md-nav__link md-nav__link--active" for="__toc">
           
   
-  
   <span class="md-ellipsis">
-    
-  
-    Lab 2
-  
-
-    
+    Лабораторная 2
   </span>
-  
   
 
           <span class="md-nav__icon md-icon"></span>
@@ -284,16 +258,9 @@
       <a href="./" class="md-nav__link md-nav__link--active">
         
   
-  
   <span class="md-ellipsis">
-    
-  
-    Lab 2
-  
-
-    
+    Лабораторная 2
   </span>
-  
   
 
       </a>
@@ -316,31 +283,16 @@
         <li class="md-nav__item">
   <a href="#_1" class="md-nav__link">
     <span class="md-ellipsis">
-      
-        Тема
-      
+      Тема
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#_2" class="md-nav__link">
+  <a href="#1-1-10-000-000-000-000" class="md-nav__link">
     <span class="md-ellipsis">
-      
-        Суть задания
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#1" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Задача 1. Сумма чисел
-      
+      Задача 1. Сумма чисел от 1 до 10 000 000 000 000
     </span>
   </a>
   
@@ -349,9 +301,16 @@
         <li class="md-nav__item">
   <a href="#2-" class="md-nav__link">
     <span class="md-ellipsis">
+      Задача 2. Параллельный парсинг веб-страниц
+    </span>
+  </a>
+  
+</li>
       
-        Задача 2. Параллельный парсинг веб-страниц
-      
+        <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      Используемая база данных
     </span>
   </a>
   
@@ -360,9 +319,7 @@
         <li class="md-nav__item">
   <a href="#_3" class="md-nav__link">
     <span class="md-ellipsis">
-      
-        Таблица для результатов парсинга
-      
+      Запуск
     </span>
   </a>
   
@@ -371,42 +328,7 @@
         <li class="md-nav__item">
   <a href="#_4" class="md-nav__link">
     <span class="md-ellipsis">
-      
-        Используемые технологии
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#_5" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Запуск
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#_6" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Сравнение подходов
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#_7" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Вывод
-      
+      Сравнение подходов
     </span>
   </a>
   
@@ -427,19 +349,12 @@
   
   
     <li class="md-nav__item">
-      <a href="../lab3/" class="md-nav__link">
+      <a href="../lab3_report/" class="md-nav__link">
         
   
-  
   <span class="md-ellipsis">
-    
-  
-    Lab 3
-  
-
-    
+    Лабораторная 3
   </span>
-  
   
 
       </a>
@@ -476,31 +391,16 @@
         <li class="md-nav__item">
   <a href="#_1" class="md-nav__link">
     <span class="md-ellipsis">
-      
-        Тема
-      
+      Тема
     </span>
   </a>
   
 </li>
       
         <li class="md-nav__item">
-  <a href="#_2" class="md-nav__link">
+  <a href="#1-1-10-000-000-000-000" class="md-nav__link">
     <span class="md-ellipsis">
-      
-        Суть задания
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#1" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Задача 1. Сумма чисел
-      
+      Задача 1. Сумма чисел от 1 до 10 000 000 000 000
     </span>
   </a>
   
@@ -509,9 +409,16 @@
         <li class="md-nav__item">
   <a href="#2-" class="md-nav__link">
     <span class="md-ellipsis">
+      Задача 2. Параллельный парсинг веб-страниц
+    </span>
+  </a>
+  
+</li>
       
-        Задача 2. Параллельный парсинг веб-страниц
-      
+        <li class="md-nav__item">
+  <a href="#_2" class="md-nav__link">
+    <span class="md-ellipsis">
+      Используемая база данных
     </span>
   </a>
   
@@ -520,9 +427,7 @@
         <li class="md-nav__item">
   <a href="#_3" class="md-nav__link">
     <span class="md-ellipsis">
-      
-        Таблица для результатов парсинга
-      
+      Запуск
     </span>
   </a>
   
@@ -531,42 +436,7 @@
         <li class="md-nav__item">
   <a href="#_4" class="md-nav__link">
     <span class="md-ellipsis">
-      
-        Используемые технологии
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#_5" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Запуск
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#_6" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Сравнение подходов
-      
-    </span>
-  </a>
-  
-</li>
-      
-        <li class="md-nav__item">
-  <a href="#_7" class="md-nav__link">
-    <span class="md-ellipsis">
-      
-        Вывод
-      
+      Сравнение подходов
     </span>
   </a>
   
@@ -582,26 +452,16 @@
           
           
             <div class="md-content" data-md-component="content">
-              
               <article class="md-content__inner md-typeset">
                 
                   
 
 
-
 <h1 id="2">Лабораторная работа 2<a class="headerlink" href="#2" title="Permanent link">&para;</a></h1>
 <h2 id="_1">Тема<a class="headerlink" href="#_1" title="Permanent link">&para;</a></h2>
 <p>Потоки, процессы и асинхронность в Python.</p>
-<h2 id="_2">Суть задания<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
-<p>Нужно было показать разные способы параллельного и асинхронного выполнения задач. В работе реализованы два типа задач: вычисление суммы большого диапазона чисел и параллельный парсинг веб-страниц.</p>
-<h2 id="1">Задача 1. Сумма чисел<a class="headerlink" href="#1" title="Permanent link">&para;</a></h2>
-<p>Требовалось посчитать сумму чисел от <code>1</code> до <code>10_000_000_000_000</code> тремя способами:</p>
-<ul>
-<li>через <code>threading</code>;</li>
-<li>через <code>multiprocessing</code>;</li>
-<li>через <code>asyncio</code>.</li>
-</ul>
-<p>Реализованные файлы:</p>
+<h2 id="1-1-10-000-000-000-000">Задача 1. Сумма чисел от 1 до 10 000 000 000 000<a class="headerlink" href="#1-1-10-000-000-000-000" title="Permanent link">&para;</a></h2>
+<p>Реализованы три программы:</p>
 <table>
 <thead>
 <tr>
@@ -628,15 +488,11 @@
 </tr>
 </tbody>
 </table>
-<p>Чтобы программа запускалась за разумное время, сумма каждого диапазона считается по формуле арифметической прогрессии, а не циклом по 10 триллионам чисел.</p>
+<p>В каждой программе используется функция <code>calculate_sum(start, end)</code>.
+Чтобы программа реально запускалась за разумное время, сумма каждого диапазона считается
+по формуле арифметической прогрессии, а не циклом по 10 триллионам чисел.</p>
 <h2 id="2-">Задача 2. Параллельный парсинг веб-страниц<a class="headerlink" href="#2-" title="Permanent link">&para;</a></h2>
-<p>Требовалось реализовать парсинг веб-страниц тремя способами:</p>
-<ul>
-<li>через <code>threading</code>;</li>
-<li>через <code>multiprocessing</code>;</li>
-<li>через <code>asyncio</code> и <code>aiohttp</code>.</li>
-</ul>
-<p>Реализованные файлы:</p>
+<p>Реализованы три программы:</p>
 <table>
 <thead>
 <tr>
@@ -663,102 +519,58 @@
 </tr>
 </tbody>
 </table>
-<p>Каждая программа загружает HTML-страницы, достает заголовок страницы и сохраняет результат в PostgreSQL.</p>
-<h2 id="_3">Таблица для результатов парсинга<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h2>
-<p>Для хранения результатов добавлена таблица <code>parsed_pages</code>.</p>
-<table>
-<thead>
-<tr>
-<th>Поле</th>
-<th>Назначение</th>
-</tr>
-</thead>
-<tbody>
-<tr>
-<td><code>url</code></td>
-<td>Адрес страницы.</td>
-</tr>
-<tr>
-<td><code>title</code></td>
-<td>Заголовок страницы.</td>
-</tr>
-<tr>
-<td><code>status_code</code></td>
-<td>HTTP-статус ответа.</td>
-</tr>
-<tr>
-<td><code>content_length</code></td>
-<td>Размер HTML.</td>
-</tr>
-<tr>
-<td><code>parser_type</code></td>
-<td>Подход, которым выполнен парсинг.</td>
-</tr>
-<tr>
-<td><code>error</code></td>
-<td>Текст ошибки, если страницу не удалось загрузить.</td>
-</tr>
-<tr>
-<td><code>created_at</code></td>
-<td>Дата и время сохранения результата.</td>
-</tr>
-</tbody>
-</table>
-<h2 id="_4">Используемые технологии<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h2>
+<p>Каждая программа содержит функцию <code>parse_and_save</code> или обертку над ней, загружает HTML,
+достает заголовок страницы и сохраняет результат в таблицу <code>parsed_pages</code>.</p>
+<h2 id="_2">Используемая база данных<a class="headerlink" href="#_2" title="Permanent link">&para;</a></h2>
+<p>Используется PostgreSQL из лабораторной работы 1. Для хранения результатов парсинга
+добавлена таблица <code>parsed_pages</code>:</p>
 <ul>
-<li>Python</li>
-<li>threading</li>
-<li>multiprocessing</li>
-<li>asyncio</li>
-<li>aiohttp</li>
-<li>requests</li>
-<li>BeautifulSoup</li>
-<li>PostgreSQL</li>
-<li>SQLAlchemy</li>
-<li>Alembic</li>
+<li><code>url</code> - адрес страницы;</li>
+<li><code>title</code> - заголовок страницы;</li>
+<li><code>status_code</code> - HTTP-статус;</li>
+<li><code>content_length</code> - размер HTML;</li>
+<li><code>parser_type</code> - подход, которым выполнен парсинг;</li>
+<li><code>error</code> - текст ошибки, если страницу не удалось загрузить.</li>
 </ul>
-<h2 id="_5">Запуск<a class="headerlink" href="#_5" title="Permanent link">&para;</a></h2>
-<p>Перед запуском программ нужно поднять PostgreSQL и применить миграции:</p>
+<h2 id="_3">Запуск<a class="headerlink" href="#_3" title="Permanent link">&para;</a></h2>
+<p>Перед запуском программ нужно применить миграции:</p>
 <pre><code class="language-bash">source .venv/bin/activate
-docker compose up -d postgres redis
 alembic upgrade head
 </code></pre>
-<p>Запуск задачи с суммой:</p>
+<p>Запуск задачи 1:</p>
 <pre><code class="language-bash">python -m scripts.lab2.sum_threading
 python -m scripts.lab2.sum_multiprocessing
 python -m scripts.lab2.sum_async
 </code></pre>
-<p>Запуск парсинга:</p>
+<p>Запуск задачи 2:</p>
 <pre><code class="language-bash">python -m scripts.lab2.parse_threading
 python -m scripts.lab2.parse_multiprocessing
 python -m scripts.lab2.parse_async
 </code></pre>
-<h2 id="_6">Сравнение подходов<a class="headerlink" href="#_6" title="Permanent link">&para;</a></h2>
+<h2 id="_4">Сравнение подходов<a class="headerlink" href="#_4" title="Permanent link">&para;</a></h2>
 <table>
 <thead>
 <tr>
 <th>Подход</th>
-<th>Особенности</th>
+<th>Ожидаемые особенности</th>
 </tr>
 </thead>
 <tbody>
 <tr>
 <td><code>threading</code></td>
-<td>Удобен для сетевых задач, потому что потоки могут ожидать ответы от разных сайтов.</td>
+<td>Удобен для сетевых запросов, но не ускоряет CPU-bound задачи из-за GIL.</td>
 </tr>
 <tr>
 <td><code>multiprocessing</code></td>
-<td>Лучше подходит для CPU-bound задач, потому что процессы обходят ограничение GIL.</td>
+<td>Подходит для CPU-bound задач, потому что процессы используют разные интерпретаторы Python.</td>
 </tr>
 <tr>
 <td><code>asyncio</code></td>
-<td>Хорош для большого количества I/O-bound операций, например HTTP-запросов.</td>
+<td>Хорош для большого количества операций ввода-вывода, например HTTP-запросов.</td>
 </tr>
 </tbody>
 </table>
-<p>Асинхронный парсер обычно работает быстрее для сетевых задач, потому что программа не блокируется на ожидании одного сайта, а одновременно ожидает ответы от нескольких сайтов.</p>
-<h2 id="_7">Вывод<a class="headerlink" href="#_7" title="Permanent link">&para;</a></h2>
-<p>В лабораторной работе были реализованы три модели конкурентного выполнения в Python. На примере суммы и парсинга показано, что выбор подхода зависит от типа задачи: для вычислений лучше подходят процессы, а для сетевых запросов - асинхронность или потоки.</p>
+<p>Фактическое время выполнения выводится каждой программой в консоль.</p>
 
 
 
@@ -805,13 +617,10 @@ python -m scripts.lab2.parse_async
     </div>
     
     
-    
-      
-      
-      <script id="__config" type="application/json">{"annotate": null, "base": "..", "features": [], "search": "../assets/javascripts/workers/search.2c215733.min.js", "tags": null, "translations": {"clipboard.copied": "\u0421\u043a\u043e\u043f\u0438\u0440\u043e\u0432\u0430\u043d\u043e \u0432 \u0431\u0443\u0444\u0435\u0440", "clipboard.copy": "\u041a\u043e\u043f\u0438\u0440\u043e\u0432\u0430\u0442\u044c \u0432 \u0431\u0443\u0444\u0435\u0440", "search.result.more.one": "\u0415\u0449\u0451 1 \u043d\u0430 \u044d\u0442\u043e\u0439 \u0441\u0442\u0440\u0430\u043d\u0438\u0446\u0435", "search.result.more.other": "\u0415\u0449\u0451 # \u043d\u0430 \u044d\u0442\u043e\u0439 \u0441\u0442\u0440\u0430\u043d\u0438\u0446\u0435", "search.result.none": "\u0421\u043e\u0432\u043f\u0430\u0434\u0435\u043d\u0438\u0439 \u043d\u0435 \u043d\u0430\u0439\u0434\u0435\u043d\u043e", "search.result.one": "\u041d\u0430\u0439\u0434\u0435\u043d\u043e 1 \u0441\u043e\u0432\u043f\u0430\u0434\u0435\u043d\u0438\u0435", "search.result.other": "\u041d\u0430\u0439\u0434\u0435\u043d\u043e \u0441\u043e\u0432\u043f\u0430\u0434\u0435\u043d\u0438\u0439: #", "search.result.placeholder": "\u041d\u0430\u0447\u043d\u0438\u0442\u0435 \u043f\u0435\u0447\u0430\u0442\u0430\u0442\u044c \u0434\u043b\u044f \u043f\u043e\u0438\u0441\u043a\u0430", "search.result.term.missing": "\u041e\u0442\u0441\u0443\u0442\u0441\u0442\u0432\u0443\u0435\u0442", "select.version": "\u0412\u044b\u0431\u0435\u0440\u0438\u0442\u0435 \u0432\u0435\u0440\u0441\u0438\u044e"}, "version": null}</script>
+    <script id="__config" type="application/json">{"base": "..", "features": [], "search": "../assets/javascripts/workers/search.6ce7567c.min.js", "translations": {"clipboard.copied": "\u0421\u043a\u043e\u043f\u0438\u0440\u043e\u0432\u0430\u043d\u043e \u0432 \u0431\u0443\u0444\u0435\u0440", "clipboard.copy": "\u041a\u043e\u043f\u0438\u0440\u043e\u0432\u0430\u0442\u044c \u0432 \u0431\u0443\u0444\u0435\u0440", "search.result.more.one": "\u0415\u0449\u0451 1 \u043d\u0430 \u044d\u0442\u043e\u0439 \u0441\u0442\u0440\u0430\u043d\u0438\u0446\u0435", "search.result.more.other": "\u0415\u0449\u0451 # \u043d\u0430 \u044d\u0442\u043e\u0439 \u0441\u0442\u0440\u0430\u043d\u0438\u0446\u0435", "search.result.none": "\u0421\u043e\u0432\u043f\u0430\u0434\u0435\u043d\u0438\u0439 \u043d\u0435 \u043d\u0430\u0439\u0434\u0435\u043d\u043e", "search.result.one": "\u041d\u0430\u0439\u0434\u0435\u043d\u043e 1 \u0441\u043e\u0432\u043f\u0430\u0434\u0435\u043d\u0438\u0435", "search.result.other": "\u041d\u0430\u0439\u0434\u0435\u043d\u043e \u0441\u043e\u0432\u043f\u0430\u0434\u0435\u043d\u0438\u0439: #", "search.result.placeholder": "\u041d\u0430\u0447\u043d\u0438\u0442\u0435 \u043f\u0435\u0447\u0430\u0442\u0430\u0442\u044c \u0434\u043b\u044f \u043f\u043e\u0438\u0441\u043a\u0430", "search.result.term.missing": "\u041e\u0442\u0441\u0443\u0442\u0441\u0442\u0432\u0443\u0435\u0442", "select.version": "\u0412\u044b\u0431\u0435\u0440\u0438\u0442\u0435 \u0432\u0435\u0440\u0441\u0438\u044e"}}</script>
     
     
-      <script src="../assets/javascripts/bundle.79ae519e.min.js"></script>
+      <script src="../assets/javascripts/bundle.88dd0f4e.min.js"></script>
       
     
   </body>
