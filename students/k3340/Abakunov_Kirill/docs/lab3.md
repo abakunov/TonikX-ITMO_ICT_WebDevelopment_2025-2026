@@ -1,215 +1,216 @@
-# Отчет по лабораторной работе №3
+# Лабораторная работа 3
 
-**Выполнил:** Абакунов Кирилл, группа K3340  
-**Цель:** овладеть практическими навыками разработки web‑сервисов средствами Django REST Framework, Djoser и PostgreSQL.  
-**Вариант:** программная система для администратора гостиницы.
+## Тема
 
-## 1. Используемые технологии
+Docker, отдельные сервисы и фоновые задачи.
 
-- **Python 3.9+**
-- **Django 3.2+** + **Django REST Framework**
-- **Djoser** (регистрация/логин по токенам)
-- **PostgreSQL** (через Docker Compose)
-- **Swagger UI / ReDoc** (drf-yasg)
+## Суть задания
 
-## 2. Модель данных (Django ORM)
+Нужно было упаковать приложение в Docker, разделить его на сервисы и добавить возможность выполнять долгие задачи через очередь. В качестве такой задачи используется парсинг веб-страниц.
 
-### Room (номер)
+## Что реализовано
 
-- **Поля:** `number` (unique), `room_type` (single/double/triple), `floor` (>=1), `phone`, `price_per_day` (>=0)
-- **Смысл:** хранит постоянные характеристики номера (тип, этаж, телефон, цена).
+В работе реализована контейнерная инфраструктура для проекта:
 
-### Guest (клиент)
+- основное FastAPI-приложение;
+- PostgreSQL;
+- отдельный parser-сервис;
+- Redis;
+- Celery worker.
 
-- **Поля:** `passport_number` (unique), `last_name`, `first_name`, `middle_name`, `city`, `check_in_date`, `check_out_date` (nullable), `room` (FK → Room, `PROTECT`)
-- **Ограничение:** `check_out_date >= check_in_date` (валидация).
-- **Смысл:** хранит историю проживания (заселение/выселение) и «текущность» через `check_out_date`.
+Парсинг можно запустить двумя способами:
 
-### Staff (служащий)
+1. Напрямую через HTTP-запрос из основного приложения в отдельный parser-сервис.
+2. Через очередь задач Celery с использованием Redis.
 
-- **Поля:** ФИО, `is_active`, `hire_date`, `fire_date` (nullable)
-- **Ограничение:** `fire_date >= hire_date` (валидация).
-- **Смысл:** сотрудники гостиницы; увольнение отмечается `is_active=False`.
+## Сервисы Docker Compose
 
-### CleaningSchedule (расписание уборки)
+| Сервис | Назначение | Порт |
+| --- | --- | --- |
+| `app` | Основное FastAPI-приложение | `8000` |
+| `postgres` | PostgreSQL-база данных | `5432` |
+| `parser` | Отдельное FastAPI-приложение для парсинга | `8001` |
+| `redis` | Брокер сообщений и backend результатов Celery | `6379` |
+| `celery_worker` | Фоновый исполнитель задач парсинга | без внешнего порта |
 
-- **Поля:** `staff` (FK → Staff, `CASCADE`), `floor` (>=1), `weekday` (1..7)
-- **Ограничение уникальности:** `(staff, floor, weekday)` уникально.
-- **Смысл:** один сотрудник может убирать разные этажи в разные дни.
+Файлы инфраструктуры:
 
-### Важные фрагменты кода (модели)
+- `Dockerfile` - образ основного FastAPI-приложения и Celery worker;
+- `Dockerfile.parser` - образ отдельного parser-сервиса;
+- `docker-compose.yml` - описание всех сервисов.
 
-Суть проверки доступности номера реализована методом `Room.is_available(...)`:
+## Прямой вызов parser-сервиса
 
-```python
-class Room(models.Model):
-    # ...
-    def is_available(self, check_in_date=None, check_out_date=None):
-        """Проверка доступности номера"""
-        from django.utils import timezone
+В основном приложении добавлен endpoint:
 
-        if check_in_date is None:
-            check_in_date = timezone.now().date()
-
-        # Ищем активные бронирования
-        active_guests = self.guests.filter(
-            check_in_date__lte=check_in_date,
-        ).filter(
-            models.Q(check_out_date__isnull=True) |
-            models.Q(check_out_date__gte=check_in_date)
-        )
-
-        if check_out_date:
-            active_guests = active_guests.filter(
-                check_in_date__lt=check_out_date
-            )
-
-        return not active_guests.exists()
+```http
+POST /parser/direct
 ```
 
-Ограничение уникальности расписания:
+Он принимает URL, отправляет HTTP-запрос в отдельный контейнер `parser` на endpoint:
 
-```python
-class CleaningSchedule(models.Model):
-    # ...
-    class Meta:
-        verbose_name = 'Расписание уборки'
-        verbose_name_plural = 'Расписания уборки'
-        ordering = ['weekday', 'floor']
-        unique_together = ['staff', 'floor', 'weekday']
+```http
+POST /parse
 ```
 
-## 3. API (DRF): основные эндпоинты
+После этого parser-сервис загружает страницу, извлекает заголовок, сохраняет результат в PostgreSQL и возвращает ответ основному приложению.
 
-Маршрутизация реализована через DRF Router:
+## Очередь задач через Redis и Celery
 
-```python
-router = DefaultRouter()
-router.register(r'rooms', RoomViewSet, basename='room')
-router.register(r'guests', GuestViewSet, basename='guest')
-router.register(r'staff', StaffViewSet, basename='staff')
-router.register(r'schedules', CleaningScheduleViewSet, basename='schedule')
-router.register(r'reports', ReportViewSet, basename='report')
+Для фонового запуска парсинга добавлены endpoints:
+
+- `POST /parser/queue` - ставит задачу парсинга URL в очередь;
+- `GET /parser/tasks/{task_id}` - возвращает статус и результат задачи;
+- `GET /parser/pages` - показывает последние сохраненные результаты парсинга.
+
+### Как это работает
+
+1. Пользователь отправляет запрос:
+
+```http
+POST /parser/queue
 ```
 
-### 3.1 Номера (`/api/rooms/`)
-
-- **CRUD:** `GET/POST /api/rooms/`, `GET/PATCH/PUT/DELETE /api/rooms/{id}/`
-- **Свободные номера (по заданию):** `GET /api/rooms/available/`
-- **Клиенты в номере за период (по заданию):** `GET /api/rooms/{id}/guests_history/?start_date=YYYY-MM-DD&end_date=YYYY-MM-DD`
-
-### 3.2 Клиенты (`/api/guests/`)
-
-- **CRUD:** `GET/POST /api/guests/`, `GET/PATCH/PUT/DELETE /api/guests/{id}/`
-- **Текущие гости:** `GET /api/guests/current/`
-- **Клиенты из города (по заданию):** `GET /api/guests/from_city/?city=...`
-- **Кто убирал номер клиента (по заданию):** `GET /api/guests/{id}/cleaning_staff/?weekday=1..7`
-- **Клиенты, проживавшие одновременно (по заданию):** `GET /api/guests/{id}/concurrent_guests/?start_date=...&end_date=...`
-- **Поселить (по заданию):** `POST /api/guests/check_in/`
-- **Выселить (по заданию):** `PATCH /api/guests/{id}/check_out/`
-
-### 3.3 Служащие (`/api/staff/`)
-
-- **CRUD:** `GET/POST /api/staff/`, `GET/PATCH/PUT/DELETE /api/staff/{id}/`
-- **Работающие:** `GET /api/staff/active/`
-- **Принять (по заданию):** `POST /api/staff/hire/`
-- **Уволить (по заданию):** `PATCH /api/staff/{id}/fire/`
-
-### 3.4 Расписание уборки (`/api/schedules/`)
-
-- **CRUD (изменение расписания по заданию):** `GET/POST /api/schedules/`, `GET/PATCH/PUT/DELETE /api/schedules/{id}/`
-- **По этажу:** `GET /api/schedules/by_floor/?floor=...`
-- **По дню недели:** `GET /api/schedules/by_weekday/?weekday=1..7`
-
-## 4. Отчет за квартал (по заданию)
-
-Эндпоинт:
-- `GET /api/reports/quarterly/?year=YYYY&quarter=1..4`
-
-Выходные данные включают:
-- число клиентов за период **по каждому номеру**
-- количество номеров **по этажам**
-- доход **по каждому номеру**
-- суммарный доход **по гостинице**
-
-Ключевой блок расчета дохода:
-
-```python
-for room in rooms:
-    guests = Guest.objects.filter(
-        room=room,
-        check_in_date__lte=end_date
-    ).filter(
-        Q(check_out_date__isnull=True) | Q(check_out_date__gte=start_date)
-    )
-
-    room_income = 0
-    for guest in guests:
-        stay_start = max(guest.check_in_date, start_date)
-        stay_end = min(
-            guest.check_out_date if guest.check_out_date else end_date,
-            end_date
-        )
-        days = (stay_end - stay_start).days + 1
-        room_income += days * float(room.price_per_day)
+```json
+{
+  "url": "https://www.python.org"
+}
 ```
 
-## 5. Аутентификация и документация API
-
-Подключение Djoser и Swagger:
+2. Основное FastAPI-приложение не парсит сайт само, а создает Celery-задачу:
 
 ```python
-urlpatterns = [
-    path('admin/', admin.site.urls),
-    path('api/', include('api.urls')),
-    path('api/auth/', include('djoser.urls')),
-    path('api/auth/', include('djoser.urls.authtoken')),
-    path('swagger/', schema_view.with_ui('swagger', cache_timeout=0), name='schema-swagger-ui'),
-    path('redoc/', schema_view.with_ui('redoc', cache_timeout=0), name='schema-redoc'),
-    path('swagger.json', schema_view.without_ui(cache_timeout=0), name='schema-json'),
-]
+parse_url_task.delay(url)
 ```
 
-Основные auth эндпоинты:
-- `POST /api/auth/users/` — регистрация
-- `POST /api/auth/token/login/` — получить токен
-- `GET /api/auth/users/me/` — текущий пользователь
+3. Задача попадает в Redis.
 
-## 6. Тестовые данные (автозаполнение)
+Redis в этой схеме работает как брокер сообщений. Он хранит очередь задач, которые нужно выполнить.
 
-Для заполнения БД реализована команда `load_hotel_data` (номера/служащие/расписание/гости):
+4. Celery worker работает отдельным процессом и слушает Redis.
 
-```python
-class Command(BaseCommand):
-    help = 'Загрузка тестовых данных в базу данных гостиницы'
+Когда появляется новая задача, worker забирает ее из очереди и выполняет Python-функцию `parse_url_task`.
 
-    def handle(self, *args, **options):
-        # ...
-        rooms = self.create_rooms()
-        staff = self.create_staff()
-        schedules = self.create_cleaning_schedules(staff, rooms)
-        guests = self.create_guests(rooms)
-        # ...
+5. Worker выполняет парсинг:
+
+- отправляет HTTP-запрос на сайт;
+- получает HTML;
+- извлекает заголовок страницы;
+- считает размер содержимого;
+- формирует результат.
+
+6. Результат сохраняется в PostgreSQL в таблицу `parsed_pages`.
+
+Схема:
+
+```text
+Пользователь
+   |
+   | POST /parser/queue
+   v
+FastAPI app
+   |
+   | создает Celery-задачу
+   v
+Redis
+   |
+   | задачу забирает
+   v
+Celery worker
+   |
+   | парсит сайт
+   v
+PostgreSQL
 ```
 
-## 7. Запуск проекта
+## Роль Redis и Celery
+
+Redis сам не выполняет код. Он хранит задачи в очереди.
+
+Celery worker - это отдельный Python-процесс, который забирает задачи из Redis и выполняет Python-функции в фоне.
+
+Коротко:
+
+```text
+Redis = очередь задач
+Celery = исполнитель задач
+```
+
+## Используемые технологии
+
+- Docker
+- Docker Compose
+- FastAPI
+- PostgreSQL
+- Redis
+- Celery
+- httpx
+- SQLAlchemy
+
+## Запуск
 
 ```bash
-cd lab3
-docker-compose up --build
+docker compose up --build
 ```
 
 После запуска:
-- Swagger UI: `http://localhost:8000/swagger/`
-- ReDoc: `http://localhost:8000/redoc/`
-- Admin: `http://localhost:8000/admin/` (логин/пароль: `admin` / `admin123`)
 
-## 8. Вывод
+```text
+http://127.0.0.1:8000/docs
+http://127.0.0.1:8001/docs
+```
 
-В ходе лабораторной работы был разработан RESTful сервис для управления гостиницей. 
+## Демонстрация
 
-✅ Реализована логика работы с номерами, клиентами, служащими и расписанием через **Django REST Framework**  
-✅ Настроена аутентификация по токенам с использованием **Djoser**  
-✅ Реализованы все требуемые эндпоинты и бизнес-логика  
-✅ API протестировано и задокументировано через Swagger/ReDoc  
-✅ Получены навыки работы с сериализацией данных, вложенными структурами JSON и ViewSets  
+1. Открыть основное API:
+
+```text
+http://127.0.0.1:8000/docs
+```
+
+2. Выполнить прямой парсинг:
+
+```http
+POST /parser/direct
+```
+
+```json
+{
+  "url": "https://example.com"
+}
+```
+
+3. Выполнить парсинг через очередь:
+
+```http
+POST /parser/queue
+```
+
+```json
+{
+  "url": "https://www.python.org"
+}
+```
+
+4. Скопировать `task_id` и проверить статус:
+
+```http
+GET /parser/tasks/{task_id}
+```
+
+5. Проверить сохраненные результаты:
+
+```http
+GET /parser/pages
+```
+
+6. Открыть отдельный parser-сервис:
+
+```text
+http://127.0.0.1:8001/docs
+```
+
+## Вывод
+
+В лабораторной работе проект был разделен на несколько сервисов и упакован в Docker. Основное приложение может взаимодействовать с отдельным parser-сервисом по HTTP, а также запускать фоновые задачи через очередь Redis и Celery worker. Такой подход позволяет не блокировать основное API долгими задачами и масштабировать обработчики отдельно.
+
